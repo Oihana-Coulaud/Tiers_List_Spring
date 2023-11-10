@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="https://thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="layout">
+<head>
+    <meta charset="UTF-8">
+    <title>Mes informations</title>
+</head>
+<body class="bg-light">
+<div layout:fragment="content">
+    <div class="card mt-3">
+        <div class="card-body">
+            <h2 class="card-title mb-3 text-center">Mes informations</h2>
+
+            <div th:if="${success}" class="alert alert-success">
+                <p th:text="${success}"></p>
+            </div>
+
+
+            <div class="border mb-3 p-2">
+                <p class="card-text">
+                    Pseudo:
+                    <span th:text="${user.username}" class="fw-bold"></span>
+                </p>
+                <p class="card-text">
+                    Email:
+                    <span th:text="${user.email}" class="fw-bold"></span>
+                </p>
+                <div class="mt-2">
+                    <a th:href="@{/modify-password}" class="mt-3 text-decoration-none text-dark " data-toggle="tooltip" title="Modifier mot de passe">
+                        <i class="bi bi-lock"></i>
+                        Modifier mot de passe
+                    </a>
+                </div>
+                <div class="mt-3">
+                    <form th:action="@{/modify-account}" method="post">
+                        <input type="hidden" id="id" name="id" th:value="${user.id}">
+                        <input type="hidden" id="username" name="username" th:value="${user.username}">
+                        <input type="hidden" id="email" name="email" th:value="${user.email}">
+                        <button type="submit" class="btn btn-outline-primary" data-toggle="tooltip" title="Éditer">
+                            Éditer
+                            <i class="bi bi-pencil"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+            <p class="card-text">Role: <span th:text="${user.role.name}" class="fw-bold text-secondary"></span></p>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

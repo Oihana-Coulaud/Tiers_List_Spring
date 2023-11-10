@@ -29,6 +29,9 @@ public class User {
         this.username = username;
         this.password = hashPassword(password);
     }
+    public Integer getId() {
+        return id;
+    }
 
     // Getter et Setter pour le champ Email
     public String getEmail() {
@@ -67,5 +70,16 @@ public class User {
         BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
         return passwordEncoder.encode(password);
     }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "id=" + id +
+                ", email='" + email + '\'' +
+                ", username='" + username + '\'' +
+                ", role=" +  role  +
+                '}';
+    }
+
 
 }

@@ -19,10 +19,6 @@ public class AuthController {
     @Autowired
     private RoleRepository roleRepository;
 
-    private String hashPassword(String password) {
-        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-        return passwordEncoder.encode(password);
-    }
 
     @PostMapping(path = "/registration")
     public String register(
