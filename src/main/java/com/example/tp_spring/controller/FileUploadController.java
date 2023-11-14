@@ -1,8 +1,15 @@
 package com.example.tp_spring.controller;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
+import com.example.tp_spring.entity.Image;
+import com.example.tp_spring.entity.Tag;
+import com.example.tp_spring.repository.ImageRepository;
+import com.example.tp_spring.repository.TagRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
@@ -27,10 +34,16 @@ public class FileUploadController {
 
     private final StorageService storageService;
 
+    private final ImageRepository imageRepository;
+
     @Autowired
-    public FileUploadController(StorageService storageService) {
+    public FileUploadController(StorageService storageService, ImageRepository imageRepository) {
         this.storageService = storageService;
+        this.imageRepository = imageRepository;
     }
+
+    @Autowired
+    private TagRepository tagRepository;
 
     @GetMapping("/files")
     public String listUploadedFiles(Model model) throws IOException {
@@ -57,19 +70,70 @@ public class FileUploadController {
     }
 
     @PostMapping("/upload")
-    public String handleFileUpload(@RequestParam("file") MultipartFile file,
-                                   RedirectAttributes redirectAttributes) {
+    public String handleFileUpload(
+            @RequestParam("files") MultipartFile[] files,
+            @RequestParam(name = "tags", required = false, defaultValue = "") String[] selectedTags,
+            RedirectAttributes redirectAttributes,
+            Model model) {
+            List<String> tags = tagRepository.findAllTagNamesOrderedAlphabetically();
+        if (files == null || files.length == 0) {
+                    model.addAttribute("tagList", tags);
+                model.addAttribute("error", "Veuillez ajouter une image");
+                return "uploadForm";
+            }
 
-        storageService.store(file);
-        redirectAttributes.addFlashAttribute("message",
-                "You successfully uploaded " + file.getOriginalFilename() + "!");
+        if (selectedTags == null || selectedTags.length == 0) {
+            model.addAttribute("tagList", tags);
+            model.addAttribute("error", "Veuillez sélectionner au moins un tag");
+            return "uploadForm";
+        }
+
+        for (MultipartFile file : files) {
+            if (file.isEmpty()) {
+                continue;
+            }
+
+            Set<Tag> imageTags = Arrays.stream(selectedTags)
+                    .map(tagName -> {
+                        Tag existingTag = tagRepository.findByName(tagName);
+                        return existingTag != null ? existingTag : new Tag(tagName);
+                    })
+                    .collect(Collectors.toSet());
+
+            Image image = new Image(file.getOriginalFilename(), "created", imageTags);
+            imageRepository.save(image);
+
+            storageService.store(file);
+        }
+
+        redirectAttributes.addFlashAttribute("message", "You successfully uploaded the images!");
 
         return "redirect:/account";
+
+    }
+
+    @PostMapping("/add-tag")
+    public String addTag(@RequestParam(name = "newTag") String newTag, Model model) {
+        if (newTag != null && !newTag.isEmpty()) {
+            tagRepository.save(new Tag(newTag));
+            List<String> tags = tagRepository.findAllTagNamesOrderedAlphabetically();
+            model.addAttribute("tagList", tags);
+            model.addAttribute("success", "Nouveau tag ajouté avec succès: " + newTag);
+        }
+        return "uploadForm";
     }
 
     @ExceptionHandler(StorageFileNotFoundException.class)
     public ResponseEntity<?> handleStorageFileNotFound(StorageFileNotFoundException exc) {
         return ResponseEntity.notFound().build();
     }
+
+    @GetMapping("/upload-form")
+    public String uploadForm(Model model) {
+        List<String> tags = tagRepository.findAllTagNamesOrderedAlphabetically();
+        model.addAttribute("tagList", tags);
+        return "uploadForm";
+    }
+
 
 }

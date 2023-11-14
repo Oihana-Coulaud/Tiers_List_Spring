@@ -1,15 +1,13 @@
 package com.example.tp_spring.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
+
+import java.util.Set;
 
 @Entity
 public class Image {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
 
     private String name;
@@ -18,10 +16,19 @@ public class Image {
 
     private String status;
 
-    public Image(String name, String path, String status) {
+    @ManyToMany
+    @JoinTable(
+            name = "image_tags",
+            joinColumns = @JoinColumn(name = "image_id"),
+            inverseJoinColumns = @JoinColumn(name = "tag_id"))
+    private Set<Tag> tags;
+    public Image() {
+    }
+    public Image(String name, String status, Set<Tag> tags) {
         this.name = name;
-        this.path = path;
+        this.path = "/images/" + name;
         this.status = status;
+        this.tags = tags;
     }
 
     public String getName() {

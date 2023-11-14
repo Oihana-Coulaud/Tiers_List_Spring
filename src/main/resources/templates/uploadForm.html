@@ -11,16 +11,42 @@
 <div layout:fragment="content">
     <div class="container mt-5">
         <h2 class="mb-4">Ajouter une image</h2>
+        <div th:if="${error}" class="alert alert-danger">
+            <p th:text="${error}"></p>
+        </div>
+        <div th:if="${success}" class="alert alert-success">
+            <p th:text="${success}"></p>
+        </div>
+        <div class="mt-5">
+            <form th:action="@{/add-tag}" method="post" enctype="multipart/form-data">
+                <div class="mb-3">
+                    <label for="newTag" class="form-label">Ajoutez un nouveau tag :</label>
+                    <input type="text" class="form-control" id="newTag" name="newTag" placeholder="Nouveau tag">
+                    <button type="submit" class="btn btn-outline-primary">Ajouter un Tag</button>
+                </div>
+            </form>
+        </div>
 
         <form th:action="@{/upload}" method="post" enctype="multipart/form-data">
             <div class="mb-3">
-                <label for="image" class="form-label">Chosissez une image:</label>
-                <input type="file" class="form-control" id="image" name="file" accept="image/*">
+                <label class="form-label">Choisissez un ou plusieurs tags existants :</label>
+                <div th:each="tag : ${tagList}">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="${'tag-' + tag}" name="tags" th:value="${tag}">
+                        <label class="form-check-label" th:for="${'tag-' + tag}" th:text="${tag}"></label>
+                    </div>
+                </div>
             </div>
+            <div class="mb-3">
+                <label for="image" class="form-label">Choisissez une image :</label>
+                <input type="file" class="form-control" id="image" name="files" accept="image/*" multiple>
+            </div>
+
             <button type="submit" class="btn btn-primary">Ajouter</button>
         </form>
-    </div>
-</div>
 
+    </div>
+
+</div>
 </body>
 </html>
