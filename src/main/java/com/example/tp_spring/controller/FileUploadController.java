@@ -81,7 +81,7 @@ public class FileUploadController {
     @PostMapping("/upload")
     public String handleFileUpload(
             @RequestParam("files") MultipartFile[] files,
-            @RequestParam(name = "tags", required = false, defaultValue = "") String[] selectedTags,
+            @RequestParam(name = "tag", required = false) String selectedTag,
             RedirectAttributes redirectAttributes,
             Model model) {
 
@@ -91,16 +91,18 @@ public class FileUploadController {
         User currentUser = userRepository.findByUsername(currentUsername);
 
         if (files == null || files.length == 0) {
-                model.addAttribute("tagList", tags);
-                model.addAttribute("error", "Veuillez ajouter une image");
-                return "uploadForm";
-            }
-
-        if (selectedTags == null || selectedTags.length == 0) {
             model.addAttribute("tagList", tags);
-            model.addAttribute("error", "Veuillez sélectionner au moins un tag");
+            model.addAttribute("error", "Veuillez ajouter une image");
             return "uploadForm";
         }
+
+        if (selectedTag == null) {
+            model.addAttribute("tagList", tags);
+            model.addAttribute("error", "Veuillez sélectionner un tag");
+            return "uploadForm";
+        }
+
+        Tag tag = tagRepository.findByName(selectedTag);
 
         for (MultipartFile file : files) {
             if (file.isEmpty()) {
@@ -108,14 +110,7 @@ public class FileUploadController {
             }
             String generatedFilename = generateUniqueFilename(file.getOriginalFilename());
 
-            Set<Tag> imageTags = Arrays.stream(selectedTags)
-                    .map(tagName -> {
-                        Tag existingTag = tagRepository.findByName(tagName);
-                        return existingTag != null ? existingTag : new Tag(tagName);
-                    })
-                    .collect(Collectors.toSet());
-
-            Image image = new Image(generatedFilename, "created", imageTags, currentUser);
+            Image image = new Image(generatedFilename, "created", tag, currentUser);
             imageRepository.save(image);
 
             storageService.store(file, generatedFilename);
@@ -124,8 +119,8 @@ public class FileUploadController {
         redirectAttributes.addFlashAttribute("message", "You successfully uploaded the images!");
 
         return "redirect:/account";
-
     }
+
     private String generateUniqueFilename(String originalFilename) {
         String timestamp = String.valueOf(System.currentTimeMillis());
         String randomString = UUID.randomUUID().toString().substring(0, 6);

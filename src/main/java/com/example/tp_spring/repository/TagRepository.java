@@ -14,4 +14,5 @@ public interface TagRepository extends CrudRepository<Tag, Long> {
 
     @Query("SELECT t.name FROM Tag t ORDER BY t.name ASC")
     List<String> findAllTagNamesOrderedAlphabetically();
+
 }

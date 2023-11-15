@@ -12,8 +12,8 @@ public class Tag {
 
     private String name;
 
-    @ManyToMany(mappedBy = "tags")
-    private Set<Image> tags;
+    @OneToMany(mappedBy = "tag")
+    private Set<Image> images;
 
     public Tag() {
     }
@@ -33,7 +33,8 @@ public class Tag {
     public String toString() {
         return "Tag{" +
                 "id=" + id +
-                ", name='" + name +
+                ", name='" + name + '\'' +
+                ", images=" + images +
                 '}';
     }
 }

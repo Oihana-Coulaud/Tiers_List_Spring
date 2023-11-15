@@ -11,23 +11,21 @@
 <div layout:fragment="content">
     <div class="container mt-5">
         <h2 class="text-center m-3">Images à valider</h2>
+        <div th:if="${success}" class="alert alert-success">
+            <p th:text="${success}"></p>
+        </div>
         <div class="row">
             <div class="col-md-4" th:each="image : ${images}">
                 <div class="card mb-4">
                     <img th:src="${image.path}" class="card-img-top" alt="Image">
                     <div class="card-body">
                         <h5 class="card-title">Tags</h5>
-                        <ul class="list-group">
-                            <!--<li class="list-group-item" th:each="tag : ${image}" th:text="${tag[tags]}"></li>-->
-                        </ul>
+                        <p th:text="${image.tag.name}"></p>
                         <!-- Accept and Reject buttons with form submission -->
-                        <form th:action="@{/accept}" method="post">
-                            <!--<input type="hidden" name="imageId" th:value="${image.id}" />-->
-                            <button type="submit" class="btn btn-success">Accept</button>
-                        </form>
-                        <form th:action="@{/reject}" method="post">
-                            <!--<input type="hidden" name="imageId" th:value="${image.id}" />-->
-                            <button type="submit" class="btn btn-danger">Reject</button>
+                        <form th:action="@{/accept-img}" method="post" class="d-flex justify-content-around">
+                            <input type="hidden" name="imageId" th:value="${image.id}" />
+                            <button type="submit" name="accept" class="btn btn-success">Accepter</button>
+                            <button type="submit" name="reject" value="true" class="btn btn-danger">Rejeter</button>
                         </form>
                     </div>
                 </div>

@@ -17,23 +17,20 @@ public class Image {
 
     private String status;
 
-    @ManyToMany
-    @JoinTable(
-            name = "image_tags",
-            joinColumns = @JoinColumn(name = "image_id"),
-            inverseJoinColumns = @JoinColumn(name = "tag_id"))
-    private Set<Tag> tags;
+    @ManyToOne
+    @JoinColumn(name = "tag_id")
+    private Tag tag;
 
     @ManyToOne
     private User user;
 
     public Image() {
     }
-    public Image(String name, String status, Set<Tag> tags, User user) {
+    public Image(String name, String status, Tag tag, User user) {
         this.name = name;
         this.path = "/images/" + name;
         this.status = status;
-        this.tags = tags;
+        this.tag = tag;
         this.user = user;
     }
 
@@ -60,6 +57,17 @@ public class Image {
     public void setStatus(String status) {
         this.status = status;
     }
+    public Tag getTag() {
+        return tag;
+    }
+
+    public void setTag(Tag tag) {
+        this.tag = tag;
+    }
+
+    public Integer getId() {
+        return id;
+    }
 
     public User getUser() {
         return user;
@@ -69,13 +77,13 @@ public class Image {
         this.user = user;
     }
 
-    @Override
-    public String toString() {
-        return "Image{" +
-                "id=" + id +
-                ", path='" + path + '\'' +
-                ", tags=" + tags +
-                ", status='" + status + '\'' +
-                '}';
-    }
+        @Override
+        public String toString() {
+            return "Image{" +
+                    "id=" + id +
+                    ", path='" + path + '\'' +
+                    ", tag=" +  tag.getName()  +
+                    ", status='" + status + '\'' +
+                    '}';
+        }
 }
