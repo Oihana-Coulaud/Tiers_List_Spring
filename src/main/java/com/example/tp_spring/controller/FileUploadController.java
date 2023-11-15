@@ -4,12 +4,16 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import com.example.tp_spring.entity.Image;
 import com.example.tp_spring.entity.Tag;
+import com.example.tp_spring.entity.User;
 import com.example.tp_spring.repository.ImageRepository;
 import com.example.tp_spring.repository.TagRepository;
+import com.example.tp_spring.repository.UserRepository;
+import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
@@ -25,6 +29,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import com.example.tp_spring.storage.StorageFileNotFoundException;
 import com.example.tp_spring.storage.StorageService;
@@ -36,10 +42,13 @@ public class FileUploadController {
 
     private final ImageRepository imageRepository;
 
+    private final UserRepository userRepository;
+
     @Autowired
-    public FileUploadController(StorageService storageService, ImageRepository imageRepository) {
+    public FileUploadController(StorageService storageService, ImageRepository imageRepository, UserRepository userRepository) {
         this.storageService = storageService;
         this.imageRepository = imageRepository;
+        this.userRepository = userRepository;
     }
 
     @Autowired
@@ -75,9 +84,14 @@ public class FileUploadController {
             @RequestParam(name = "tags", required = false, defaultValue = "") String[] selectedTags,
             RedirectAttributes redirectAttributes,
             Model model) {
-            List<String> tags = tagRepository.findAllTagNamesOrderedAlphabetically();
+
+        List<String> tags = tagRepository.findAllTagNamesOrderedAlphabetically();
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String currentUsername = authentication.getName();
+        User currentUser = userRepository.findByUsername(currentUsername);
+
         if (files == null || files.length == 0) {
-                    model.addAttribute("tagList", tags);
+                model.addAttribute("tagList", tags);
                 model.addAttribute("error", "Veuillez ajouter une image");
                 return "uploadForm";
             }
@@ -92,6 +106,7 @@ public class FileUploadController {
             if (file.isEmpty()) {
                 continue;
             }
+            String generatedFilename = generateUniqueFilename(file.getOriginalFilename());
 
             Set<Tag> imageTags = Arrays.stream(selectedTags)
                     .map(tagName -> {
@@ -100,16 +115,23 @@ public class FileUploadController {
                     })
                     .collect(Collectors.toSet());
 
-            Image image = new Image(file.getOriginalFilename(), "created", imageTags);
+            Image image = new Image(generatedFilename, "created", imageTags, currentUser);
             imageRepository.save(image);
 
-            storageService.store(file);
+            storageService.store(file, generatedFilename);
         }
 
         redirectAttributes.addFlashAttribute("message", "You successfully uploaded the images!");
 
         return "redirect:/account";
 
+    }
+    private String generateUniqueFilename(String originalFilename) {
+        String timestamp = String.valueOf(System.currentTimeMillis());
+        String randomString = UUID.randomUUID().toString().substring(0, 6);
+        String fileExtension = FilenameUtils.getExtension(originalFilename);
+
+        return timestamp + "_" + randomString + "." + fileExtension;
     }
 
     @PostMapping("/add-tag")

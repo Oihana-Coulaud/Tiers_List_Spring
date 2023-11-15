@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="https://thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="layout">
+<head>
+    <meta charset="UTF-8">
+    <title>Créer une liste</title>
+</head>
+<body class="bg-light">
+<div layout:fragment="content">
+    <div class="container mt-5">
+        <h2>Créer une liste</h2>
+        <div th:if="${error}" class="alert alert-danger">
+            <p th:text="${error}"></p>
+        </div>
+        <form th:action="@{/create-list}" method="post" class="needs-validation" novalidate>
+            <div class="form-group mb-2">
+                <label for="name">Nom de la liste :</label>
+                <input type="text" class="form-control" id="name" name="name" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Créer</button>
+        </form>
+    </div>
+</div>
+</body>
+</html>

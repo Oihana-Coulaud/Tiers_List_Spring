@@ -17,7 +17,7 @@
 
         void init();
 
-        void store(MultipartFile file);
+        void store(MultipartFile file, String filename);
 
         Stream<Path> loadAll();
 

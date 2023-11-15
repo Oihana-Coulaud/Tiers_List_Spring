@@ -3,10 +3,13 @@ package com.example.tp_spring.entity;
 import jakarta.persistence.*;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
+import java.util.List;
+
 @Entity
 public class User {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+
     private Integer id;
 
     private String email;
@@ -15,8 +18,11 @@ public class User {
 
     private String password;
 
-   @ManyToOne
+    @ManyToOne
     private Role role;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<TiersList> tiersLists;
 
     // Constructeur par défaut
     public User() {
@@ -64,6 +70,14 @@ public class User {
 
     public void setRole(Role role) {
         this.role = role;
+    }
+
+    public List<TiersList> getTiersLists() {
+        return tiersLists;
+    }
+
+    public void setTiersLists(List<TiersList> tiersLists) {
+        this.tiersLists = tiersLists;
     }
     private String hashPassword(String password) {
         BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();

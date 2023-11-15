@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="https://thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="layout">
+<head>
+    <meta charset="UTF-8">
+    <title>Images à valider</title>
+</head>
+<body class="bg-light">
+<div layout:fragment="content">
+    <div class="container mt-5">
+        <h2 class="text-center m-3">Images à valider</h2>
+        <div class="row">
+            <div class="col-md-4" th:each="image : ${images}">
+                <div class="card mb-4">
+                    <img th:src="${image.path}" class="card-img-top" alt="Image">
+                    <div class="card-body">
+                        <h5 class="card-title">Tags</h5>
+                        <ul class="list-group">
+                            <!--<li class="list-group-item" th:each="tag : ${image}" th:text="${tag[tags]}"></li>-->
+                        </ul>
+                        <!-- Accept and Reject buttons with form submission -->
+                        <form th:action="@{/accept}" method="post">
+                            <!--<input type="hidden" name="imageId" th:value="${image.id}" />-->
+                            <button type="submit" class="btn btn-success">Accept</button>
+                        </form>
+                        <form th:action="@{/reject}" method="post">
+                            <!--<input type="hidden" name="imageId" th:value="${image.id}" />-->
+                            <button type="submit" class="btn btn-danger">Reject</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

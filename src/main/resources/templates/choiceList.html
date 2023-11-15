@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="https://thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="layout">
+<head>
+    <meta charset="UTF-8">
+    <title>Ajouter vos rangs</title>
+</head>
+<body class="bg-light">
+<div layout:fragment="content" class="container mt-5">
+    <div class="row">
+        <h2 class="text-center mb-5"> Liste : <span th:text="${listName}"></span></h2>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    Importer mes images
+                </div>
+            </div>
+        </div>
+
+        <!-- Card for Using Images from Other Users -->
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    Utiliser des images d'autres utilisateurs
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

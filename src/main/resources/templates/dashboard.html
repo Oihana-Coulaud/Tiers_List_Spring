@@ -9,7 +9,23 @@
 </head>
 <body class="bg-light">
 <div layout:fragment="content">
-    <p>TOTOTO</p>
+    <h2 class="text-center m-3">Listes de l'utilisateur</h2>
+
+    <!-- Check if there are userLists -->
+    <div th:if="${userLists}">
+        <!-- Iterate over userLists and display them -->
+        <div th:each="list : ${userLists}">
+            <div class="card mb-3">
+                <div class="card-body">
+                    <h5 class="card-title" th:text="${list.name}"></h5>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div th:unless="${userLists}">
+        <p>No lists available for the user.</p>
+    </div>
 </div>
 
 </body>
