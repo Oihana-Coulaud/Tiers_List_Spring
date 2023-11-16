@@ -29,6 +29,14 @@ public class TiersList {
     @OneToMany(mappedBy = "tiersList", cascade = CascadeType.ALL)
     private List<Ranking> rankings;
 
+    public Integer getId() {
+        return id;
+    }
+
+    public List<Ranking> getRankings() {
+        return rankings;
+    }
+
     public String getName() {
         return name;
     }
@@ -53,4 +61,23 @@ public class TiersList {
         this.user = user;
     }
 
+    @Override
+    public String toString() {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("TiersList{");
+        stringBuilder.append("id=").append(id);
+        stringBuilder.append(", name='").append(name).append('\'');
+
+        // Iterate over rankings and append relevant information
+        if (rankings != null) {
+            stringBuilder.append(", rankings=[");
+            for (Ranking ranking : rankings) {
+                stringBuilder.append("{rankingId=").append(ranking.getId()).append(", images=").append(ranking.getImages()).append("}, ");
+            }
+            stringBuilder.append("]");
+        }
+
+        stringBuilder.append('}');
+        return stringBuilder.toString();
+    }
 }

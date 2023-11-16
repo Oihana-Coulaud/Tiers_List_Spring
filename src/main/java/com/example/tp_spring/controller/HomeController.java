@@ -28,7 +28,6 @@ public class HomeController {
 
         // Add the lists to the model
         model.addAttribute("userLists", userLists);
-
         boolean isAdmin = hasAdminRole(authentication);
 
         if(isAdmin){

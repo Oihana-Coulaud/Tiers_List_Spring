@@ -21,13 +21,13 @@
                             <a class="nav-link active" th:href="@{/}">Accueil</a>
                         </li>
                         <li class="nav-item" th:if="${#authorization.expression('hasRole(''USER'')')}">
-                            <a class="nav-link active" th:href="@{/account}">Mon profil</a>
-                        </li>
-                        <li class="nav-item" th:if="${#authorization.expression('hasRole(''USER'')')}">
                             <a class="nav-link active" th:href="@{/upload-form}">Ajouter des images</a>
                         </li>
                         <li class="nav-item" th:if="${#authorization.expression('hasRole(''USER'')')}">
                             <a class="nav-link active" th:href="@{/add-list}">Créer une liste</a>
+                        </li>
+                        <li class="nav-item" th:if="${#authorization.expression('hasRole(''USER'')')}">
+                            <a class="nav-link active" th:href="@{/account}">Mon profil</a>
                         </li>
                         <li class="nav-item" th:if="${#authorization.expression('isAuthenticated()')}">
                             <a class="nav-link active" th:href="@{/logout}">Déconnexion</a>

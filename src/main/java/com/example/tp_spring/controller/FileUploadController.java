@@ -1,16 +1,15 @@
 package com.example.tp_spring.controller;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import com.example.tp_spring.entity.Image;
+import com.example.tp_spring.entity.Ranking;
 import com.example.tp_spring.entity.Tag;
 import com.example.tp_spring.entity.User;
 import com.example.tp_spring.repository.ImageRepository;
+import com.example.tp_spring.repository.RankingRepository;
 import com.example.tp_spring.repository.TagRepository;
 import com.example.tp_spring.repository.UserRepository;
 import org.apache.commons.io.FilenameUtils;
@@ -28,12 +27,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import com.example.tp_spring.storage.StorageFileNotFoundException;
 import com.example.tp_spring.storage.StorageService;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 public class FileUploadController {
@@ -45,14 +44,18 @@ public class FileUploadController {
     private final UserRepository userRepository;
 
     @Autowired
+    private TagRepository tagRepository;
+
+    @Autowired
+    private RankingRepository rankingRepository;
+
+
+    @Autowired
     public FileUploadController(StorageService storageService, ImageRepository imageRepository, UserRepository userRepository) {
         this.storageService = storageService;
         this.imageRepository = imageRepository;
         this.userRepository = userRepository;
     }
-
-    @Autowired
-    private TagRepository tagRepository;
 
     @GetMapping("/files")
     public String listUploadedFiles(Model model) throws IOException {
@@ -121,6 +124,54 @@ public class FileUploadController {
         return "redirect:/account";
     }
 
+
+    @PostMapping("/upload-list-img")
+    public String handleFileUpload(
+            @RequestParam("files") MultipartFile[] files,
+            @RequestParam String selectedTag,
+            @RequestParam String rank,
+            @RequestParam Map<String, String> allParams,
+            RedirectAttributes redirectAttributes,
+            Model model) {
+
+        List<String> rankNames = allParams.entrySet().stream()
+                .filter(entry -> entry.getKey().startsWith("rankName"))
+                .map(Map.Entry::getValue)
+                .toList();
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String currentUsername = authentication.getName();
+        User currentUser = userRepository.findByUsername(currentUsername);
+
+        Tag tag = tagRepository.findByName(selectedTag);
+        Ranking currentRanking = rankingRepository.findByName(rank);
+
+        model.addAttribute("tagList", selectedTag);
+        model.addAttribute("selectedTag", selectedTag);
+        model.addAttribute("ranks", rankNames);
+
+        for (MultipartFile file : files) {
+            if (file.isEmpty()) {
+                model.addAttribute("error", "Veuillez ajouter une ou plusieurs image" );
+                return "addListDetails";
+            }
+
+            String generatedFilename = generateUniqueFilename(file.getOriginalFilename());
+
+            Image image = new Image(generatedFilename, "created", tag, currentUser);
+            Set<Ranking> rankings = new HashSet<>();
+            rankings.add(currentRanking);
+            image.setRankings(rankings);
+            imageRepository.save(image);
+
+            storageService.store(file, generatedFilename);
+        }
+
+        model.addAttribute("success", "Les images ont bien était ajouté au rang " + rank );
+        model.addAttribute("successRank", rank);
+
+        return "addListDetails";
+    }
+
     private String generateUniqueFilename(String originalFilename) {
         String timestamp = String.valueOf(System.currentTimeMillis());
         String randomString = UUID.randomUUID().toString().substring(0, 6);
@@ -129,16 +180,7 @@ public class FileUploadController {
         return timestamp + "_" + randomString + "." + fileExtension;
     }
 
-    @PostMapping("/add-tag")
-    public String addTag(@RequestParam(name = "newTag") String newTag, Model model) {
-        if (newTag != null && !newTag.isEmpty()) {
-            tagRepository.save(new Tag(newTag));
-            List<String> tags = tagRepository.findAllTagNamesOrderedAlphabetically();
-            model.addAttribute("tagList", tags);
-            model.addAttribute("success", "Nouveau tag ajouté avec succès: " + newTag);
-        }
-        return "uploadForm";
-    }
+
 
     @ExceptionHandler(StorageFileNotFoundException.class)
     public ResponseEntity<?> handleStorageFileNotFound(StorageFileNotFoundException exc) {

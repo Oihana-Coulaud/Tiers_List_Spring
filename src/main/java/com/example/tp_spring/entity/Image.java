@@ -24,6 +24,9 @@ public class Image {
     @ManyToOne
     private User user;
 
+    @ManyToMany
+    private Set<Ranking> rankings;
+
     public Image() {
     }
     public Image(String name, String status, Tag tag, User user) {
@@ -77,7 +80,15 @@ public class Image {
         this.user = user;
     }
 
-        @Override
+    public Set<Ranking> getRankings() {
+        return rankings;
+    }
+
+    public void setRankings(Set<Ranking> rankings) {
+        this.rankings = rankings;
+    }
+
+    @Override
         public String toString() {
             return "Image{" +
                     "id=" + id +

@@ -5,16 +5,18 @@
       layout:decorate="layout">
 <head>
     <meta charset="UTF-8">
-    <title>Ajouter vos rangs</title>
+    <title>Choix du type de liste</title>
 </head>
 <body class="bg-light">
 <div layout:fragment="content" class="container mt-5">
     <div class="row">
         <h2 class="text-center mb-5"> Liste : <span th:text="${listName}"></span></h2>
+        <h3 class="m-4">Comment voulez vous choisir vos images : </h3>
         <div class="col-md-6">
             <div class="card">
-                <div class="card-header">
-                    Importer mes images
+                <div class="card-header text-center">
+                    <!-- Link to the "upload form" -->
+                    <a th:href="@{/listDetails(ranks=${ranks}, listName=${listName}, tag=${tag})}" class="btn btn-primary">Importer mes images</a>
                 </div>
             </div>
         </div>

@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="https://thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="layout">
+<head>
+    <meta charset="UTF-8">
+    <title>Votre liste</title>
+</head>
+<body class="bg-light">
+<div layout:fragment="content" class="container mt-5">
+    <h2 class="text-center mb-5"> Ajout d'image à la liste : <span th:text="${listName}"></span></h2>
+    <h4 class="m-3"> Tag de la liste : <span th:text="${selectedTag}"></span> </h4>
+    <div th:if="${error}" class="alert alert-danger">
+        <p th:text="${error}"></p>
+    </div>
+    <div th:if="${success}" class="alert alert-success">
+        <p th:text="${success}"></p>
+    </div>
+
+    <div class="mt-5">
+        <th:block th:each="rank : ${ranks}">
+            <form th:action="@{/upload-list-img}" method="post" enctype="multipart/form-data">
+                <input type="hidden" th:name="selectedTag" th:value="${selectedTag}" />
+                <input type="hidden" th:each="r : ${ranks}" th:name="'rankName' + ${r}" th:value="${r}" />
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th>Rang</th>
+                        <th>Images</th>
+                        <th></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td>
+                            <h3 th:text="${rank}"></h3>
+                            <input type="hidden" name="rank" th:value="${rank}" />
+                        </td>
+                        <td>
+                            <input type="file" class="form-control" id="image" name="files" accept="image/*" multiple>
+                        </td>
+                        <td>
+                            <button type="submit" class="btn btn-primary">Enregistrer</button>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </form>
+            <!--<a th:href="@{'/show-list?listName=' + ${listName}">
+                <button class="btn btn-primary">Voir ma liste</button>
+            </a>-->
+        </th:block>
+    </div>
+</div>
+</body>
+</html>

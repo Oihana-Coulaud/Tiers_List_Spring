@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="https://thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="layout">
+<head>
+  <meta charset="UTF-8">
+  <title>List Details</title>
+</head>
+<body class="bg-light">
+<div layout:fragment="content">
+  <h2 class="text-center m-3">List Details</h2>
+
+  <!-- Check if the TiersList is present -->
+  <div th:if="${tiersList.isPresent()}">
+    <!-- Display TiersList information -->
+    <div>
+      <h3 th:text="${tiersList.get().name}"></h3>
+      <p th:text="'ID: ' + ${tiersList.get().id}"></p>
+
+      <!-- Create a table for Rang, Image, and Tag -->
+      <table class="table">
+        <thead>
+        <tr>
+          <th>Rang</th>
+          <th>Image</th>
+          <th>Tag</th>
+        </tr>
+        </thead>
+        <tbody>
+        <!-- Iterate over rankings and display information -->
+        <div th:each="ranking : ${tiersList.get().rankings}">
+          <tr>
+            <td th:text="${ranking.name}"></td>
+            <td>
+              <div th:each="imageEntry : ${ranking.images}" style="display: inline-block; margin-right: 10px;">
+                <img th:src="${imageEntry.path}" alt="Image" th:style="'max-width: 150px; max-height: 150px;'">
+              </div>
+            </td>
+            <td>
+            <td>
+              <div style="display: inline-block;">
+                <p th:text="${ranking.images[0].tag.name}"></p>
+              </div>
+            </td>
+          </tr>
+        </div>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+</body>
+</html>
